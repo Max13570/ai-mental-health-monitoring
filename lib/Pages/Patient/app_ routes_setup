@@ -1,0 +1,52 @@
+// Add this to your main.dart or wherever you define your app routes
+
+import 'package:flutter/material.dart';
+import 'mental_health_assessment_screen.dart';
+import 'mental_health_report_screen.dart';
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Mental Health Monitor',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(), // Your home screen
+        '/assessment': (context) => const MentalHealthAssessmentScreen(),
+        '/report': (context) => const MentalHealthReportScreen(),
+      },
+    );
+  }
+}
+
+// Alternative: If you're using named routes with RouteSettings
+class AppRoutes {
+  static const String home = '/';
+  static const String assessment = '/assessment';
+  static const String report = '/report';
+
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case home:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case assessment:
+        return MaterialPageRoute(builder: (_) => const MentalHealthAssessmentScreen());
+      case report:
+        return MaterialPageRoute(builder: (_) => const MentalHealthReportScreen());
+      default:
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(
+              child: Text('No route defined for ${settings.name}'),
+            ),
+          ),
+        );
+    }
+  }
+}

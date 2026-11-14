@@ -1,0 +1,623 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class MentalHealthScaleWidget extends StatefulWidget {
+  final int depressionScore;
+  final int anxietyScore;
+  final int stressScore;
+  final String? overallSeverity;
+  final DateTime assessmentDate;
+
+  const MentalHealthScaleWidget({
+    super.key,
+    required this.depressionScore,
+    required this.anxietyScore,
+    required this.stressScore,
+    this.overallSeverity,
+    required this.assessmentDate,
+  });
+
+  @override
+  State<MentalHealthScaleWidget> createState() => _MentalHealthScaleWidgetState();
+}
+
+class _MentalHealthScaleWidgetState extends State<MentalHealthScaleWidget>
+    with TickerProviderStateMixin {
+
+  late AnimationController _scaleAnimationController;
+  late AnimationController _pulseAnimationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _pulseAnimation;
+
+  static const Color medicalBlue = Color(0xFF1E3A8A);
+  static const Color medicalTeal = Color(0xFF0F766E);
+  static const Color lightMedicalBlue = Color(0xFF3B82F6);
+  static const Color medicalGray = Color(0xFF64748B);
+  static const Color successGreen = Color(0xFF10B981);
+  static const Color errorRed = Color(0xFFEF4444);
+  static const Color warningOrange = Color(0xFFF59E0B);
+  static const Color lightGray = Color(0xFFF8FAFC);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scaleAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+
+    _pulseAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _scaleAnimationController,
+      curve: Curves.elasticOut,
+    );
+
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.1,
+    ).animate(CurvedAnimation(
+      parent: _pulseAnimationController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Start animations
+    _scaleAnimationController.forward();
+    _pulseAnimationController.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _scaleAnimationController.dispose();
+    _pulseAnimationController.dispose();
+    super.dispose();
+  }
+
+  Color _getScoreColor(int score, String type) {
+    switch (type.toLowerCase()) {
+      case 'depression':
+        if (score <= 4) return successGreen;
+        if (score <= 9) return lightMedicalBlue;
+        if (score <= 14) return warningOrange;
+        if (score <= 19) return Color(0xFFFF6B35);
+        return errorRed;
+      case 'anxiety':
+        if (score <= 4) return successGreen;
+        if (score <= 9) return lightMedicalBlue;
+        if (score <= 14) return warningOrange;
+        return errorRed;
+      case 'stress':
+        if (score <= 6) return successGreen;
+        if (score <= 12) return warningOrange;
+        return errorRed;
+      default:
+        return medicalGray;
+    }
+  }
+
+  String _getScoreLabel(int score, String type) {
+    switch (type.toLowerCase()) {
+      case 'depression':
+        if (score <= 4) return 'Minimal';
+        if (score <= 9) return 'Mild';
+        if (score <= 14) return 'Moderate';
+        if (score <= 19) return 'Mod. Severe';
+        return 'Severe';
+      case 'anxiety':
+        if (score <= 4) return 'Minimal';
+        if (score <= 9) return 'Mild';
+        if (score <= 14) return 'Moderate';
+        return 'Severe';
+      case 'stress':
+        if (score <= 6) return 'Low';
+        if (score <= 12) return 'Moderate';
+        return 'High';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  double _getScorePercentage(int score, String type) {
+    switch (type.toLowerCase()) {
+      case 'depression':
+        return (score / 27).clamp(0.0, 1.0); // PHQ-9 max is 27
+      case 'anxiety':
+        return (score / 21).clamp(0.0, 1.0); // GAD-7 max is 21
+      case 'stress':
+        return (score / 18).clamp(0.0, 1.0); // PSS-6 adapted max is 18
+      default:
+        return 0.0;
+    }
+  }
+
+  Color _getOverallSeverityColor() {
+    if (widget.overallSeverity == null) return medicalGray;
+
+    final severity = widget.overallSeverity!.toLowerCase();
+    if (severity.contains('low') || severity.contains('minimal')) {
+      return successGreen;
+    } else if (severity.contains('mild') || severity.contains('moderate')) {
+      return warningOrange;
+    } else if (severity.contains('high') || severity.contains('severe')) {
+      return errorRed;
+    }
+    return medicalGray;
+  }
+
+  Widget _buildCircularScaleIndicator(String title, int score, String type) {
+    final color = _getScoreColor(score, type);
+    final percentage = _getScorePercentage(score, type);
+    final label = _getScoreLabel(score, type);
+
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Container(
+            width: 140,
+            height: 140,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Background circle
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                ),
+                // Progress indicator
+                SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: CircularProgressIndicator(
+                    value: percentage,
+                    strokeWidth: 8,
+                    backgroundColor: color.withOpacity(0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
+                ),
+                // Center content
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      score.toString(),
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: medicalGray,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLinearProgressBar(String title, int score, String type) {
+    final color = _getScoreColor(score, type);
+    final percentage = _getScorePercentage(score, type);
+    final label = _getScoreLabel(score, type);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: medicalBlue,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$score - $label',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          AnimatedBuilder(
+            animation: _scaleAnimation,
+            builder: (context, child) {
+              return Stack(
+                children: [
+                  Container(
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: percentage * _scaleAnimation.value,
+                    child: Container(
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withOpacity(0.3),
+                            spreadRadius: 1,
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverallSeverityIndicator() {
+    if (widget.overallSeverity == null) return const SizedBox.shrink();
+
+    final color = _getOverallSeverityColor();
+
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _pulseAnimation.value,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: color.withOpacity(0.3), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.2),
+                  spreadRadius: 2,
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _getSeverityIcon(),
+                    color: color,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Overall Assessment',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: medicalGray,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.overallSeverity!,
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    'AI Analysis',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _getSeverityIcon() {
+    if (widget.overallSeverity == null) return Icons.help_outline_rounded;
+
+    final severity = widget.overallSeverity!.toLowerCase();
+    if (severity.contains('low') || severity.contains('minimal')) {
+      return Icons.sentiment_very_satisfied_rounded;
+    } else if (severity.contains('mild')) {
+      return Icons.sentiment_satisfied_rounded;
+    } else if (severity.contains('moderate')) {
+      return Icons.sentiment_neutral_rounded;
+    } else if (severity.contains('high') || severity.contains('severe')) {
+      return Icons.sentiment_dissatisfied_rounded;
+    }
+    return Icons.psychology_rounded;
+  }
+
+  Widget _buildWellnessCompass() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: medicalBlue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.explore_rounded,
+                  color: medicalBlue,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Wellness Compass',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: medicalBlue,
+                    ),
+                  ),
+                  Text(
+                    'Assessment completed on ${_formatDate(widget.assessmentDate)}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: medicalGray,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildCircularScaleIndicator('Depression', widget.depressionScore, 'depression'),
+              _buildCircularScaleIndicator('Anxiety', widget.anxietyScore, 'anxiety'),
+              _buildCircularScaleIndicator('Stress', widget.stressScore, 'stress'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your Mental Health Scale',
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: medicalBlue,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Visual representation of your latest assessment results',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: medicalGray,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Wellness Compass - Circular indicators
+          _buildWellnessCompass(),
+
+          const SizedBox(height: 20),
+
+          // Overall Severity (if available)
+          if (widget.overallSeverity != null) ...[
+            _buildOverallSeverityIndicator(),
+            const SizedBox(height: 20),
+          ],
+
+          // Linear progress bars for detailed view
+          Text(
+            'Detailed Breakdown',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: medicalBlue,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          _buildLinearProgressBar('Depression Level', widget.depressionScore, 'depression'),
+          const SizedBox(height: 12),
+          _buildLinearProgressBar('Anxiety Level', widget.anxietyScore, 'anxiety'),
+          const SizedBox(height: 12),
+          _buildLinearProgressBar('Stress Level', widget.stressScore, 'stress'),
+
+          const SizedBox(height: 20),
+
+          // Legend and info
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: lightGray,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: medicalBlue.withOpacity(0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.info_outline_rounded, color: medicalBlue, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Understanding Your Results',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: medicalBlue,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'This scale provides a visual representation of your mental health assessment. Remember that these results are for informational purposes and should complement, not replace, professional mental health care.',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: medicalGray,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    _buildLegendItem(successGreen, 'Low/Minimal'),
+                    const SizedBox(width: 16),
+                    _buildLegendItem(warningOrange, 'Moderate'),
+                    const SizedBox(width: 16),
+                    _buildLegendItem(errorRed, 'High/Severe'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: medicalGray,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
