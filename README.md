@@ -1,81 +1,72 @@
 # 🧠 AI-Powered Mental Health Monitoring App
 ### Depression, Stress & Anxiety | Eswatini
 
-A Flutter-based mobile app for early mental-health screening using questionnaire-based assessments, machine-learning-assisted analysis, personalized recommendations, and healthcare-provider workflows.
+A Flutter-based mobile app for early mental-health screening in Eswatini, using questionnaire-based assessments, machine-learning-assisted analysis, personalized recommendations, and healthcare-provider workflows.
 
-Built to improve access to mental-health support in underserved communities where stigma, distance, and shortages of professionals are real barriers.
+Built to solve a real problem: stigma, long distances to clinics, and a severe shortage of mental-health professionals leaving many emaSwati undiagnosed and untreated.
 
 > **Final-Year Project | BSc Computer Science**
-> **Author:** Mancoba Maxwell Shabalala
+> **Author:** Mancoba Maxwell Shabalala (202080165)
+> **University:** Eswatini Medical Christian University, Mbabane
+> **Supervisor:** Mr. F Mthethwa | **Presented:** 24 Sept 2025
 
 ---
 
-## 🎯 What It Does
-
-- Digital self-assessments for depression, stress & anxiety
-- AI-assisted analysis + personalized recommendations
-- Appointment booking & management
-- Role-based access for the full clinic workflow
+## 🎯 Aim
+To develop an AI-powered mental health monitoring app that assists individuals in managing depression, stress, and anxiety, while providing real-time recommendations to mental health professionals — private, stigma-free, and accessible.
 
 ## ✨ Features by Role
 
 **👤 Patient**
-- Registration & login
-- Mental-health self-assessments
-- Assessment results + AI recommendations
-- Appointment booking & consultation access
-- Personal dashboard
+- Register / Login, Personal dashboard
+- Self-assessment for depression, stress & anxiety
+- AI-assisted results + personalized recommendations
+- Book appointment, Join live consultation
 
 **👨🏽‍⚕️ Healthcare Provider**
-- Provider dashboard
-- View patient assessment information
-- Access AI-assisted recommendations
-- Consultation workflow
+- Provider dashboard, View patient assessments
+- Access AI recommendations, Start live consultation
 
 **📅 Receptionist**
-- View booked appointments
-- Accept / manage appointments
+- View appointments, Accept / manage appointments
 - Set appointment reminders
 
-**🛡️ Administrator**
-- Manage user accounts
-- Account & security management
+**🛡️ Admin**
+- Dashboard with system analytics, user logs, security alerts
+- Manage user accounts & access
 
-## 🤖 AI & Machine Learning
+## 🏗️ System Architecture
 
-ML Workflow:
-`Dataset → Cleaning → Preprocessing → Feature Engineering → Training → Evaluation → Prediction → Recommendations`
+**Frontend:** Flutter (Dart) — cross-platform Android & iOS
+**Application Layer:** Business logic, auth, session management
+**Backend / AI:** Python in Jupyter Notebook, FastAPI, TensorFlow Serving
+**Database:** Firebase Firestore (real-time sync) + AWS S3 (secure logs/reports)
+**Security:** Firebase Auth, OAuth 2.0, JWT, Role-Based Access Control (RBAC), encryption, GDPR/HIPAA-aware design
 
-Models support classification of mental-health assessment data and generate AI-assisted recommendations.
+**AI Workflow:**
+`Kaggle Dataset → Cleaning → Preprocessing → Feature Engineering → Training → Evaluation → Prediction → Recommendations`
 
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
 | :--- | :--- |
-| Flutter / Dart | Mobile app development |
-| Firebase Auth | User authentication |
-| Cloud Firestore | Cloud database |
-| Python | Machine learning & data processing |
-| Jupyter Notebook | ML experimentation & evaluation |
-| Git / GitHub | Version control |
-
-## 🏗️ System Architecture
-
-Flutter Mobile App + Firebase Services + Python ML Components
+| Flutter / Dart | Mobile app |
+| Python / Jupyter | ML training & data processing |
+| FastAPI / TensorFlow Serving | AI model deployment & real-time inference |
+| Firebase Auth / Firestore | Auth + real-time database |
+| AWS S3 | Secure storage for logs/reports |
+| Postman / JUnit / Mockito / Firebase Test Lab | API & app testing |
+| Git / GitHub | Version control + CI/CD |
+| Android Studio / VS Code | Development |
 
 ## 📱 Screenshots
-
-### Welcome & Authentication
-![Welcome Screen](screenshots/01-welcome.png)
-
-### Patient Dashboard
-![Patient Dashboard](screenshots/02-patient-dashboard.png)
-
-### Mental Health Assessment
-![Assessment](screenshots/03-assessment.png)
-
-### Appointment Booking
-![Appointment](screenshots/04-appointment.png)
+*From your doc, pages 23-31 — we can extract these*
+- Welcome → Role Selection → Login
+- Patient Dashboard → Assessment → Assessment Result
+- Appointment → Live Consultation
+- Receptionist Dashboard → Accept Appointment → Reminder
+- Provider Dashboard → Recommendation → Consultation
+- Admin Dashboard → Manage Accounts
 
 ## ⚙️ Installation
 
