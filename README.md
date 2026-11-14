@@ -69,17 +69,17 @@ To develop an AI-powered mental health monitoring app that assists individuals i
 
 ## 📱 Screenshots
 
-| Welcome | Role Selection | Login |
+| Welcome | Login | Assessment |
 | --- | --- | --- |
-| ![Welcome](screenshots/01-welcome.png) | ![Role Selection](screenshots/02-role-selection.png) | ![Login](screenshots/03-login.png) |
+| ![Welcome](screenshots/01-welcome.png) | ![Login](screenshots/02-login.png) | ![Assessment](screenshots/03-assessment.png) |
 
-| Patient Dashboard | Assessment | Assessment Result |
+| Appointment | Receptionist | Provider |
 | --- | --- | --- |
-| ![Patient Dashboard](screenshots/04-patient-dashboard.png) | ![Assessment](screenshots/05-assessment.png) | ![Result](screenshots/06-result.png) |
+| ![Appointment](screenshots/05-appointment.png) | ![Receptionist](screenshots/06-receptionist.png) | ![Provider](screenshots/07-provider.png) |
 
-| Appointment | Provider Dashboard | Admin Dashboard |
-| --- | --- | --- |
-| ![Appointment](screenshots/07-appointment.png) | ![Provider](screenshots/08-provider-dashboard.png) | ![Admin](screenshots/09-admin-dashboard.png) |
+| Admin | Admin - Manage Accounts |
+| --- | --- |
+| ![Admin](screenshots/08-admin.png) | ![Admin Manage](screenshots/09-admin-manage.png) |
 
 ---
 
